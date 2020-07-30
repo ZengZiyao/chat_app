@@ -24,5 +24,9 @@ public class AppUserDetailsService implements UserDetailsService {
         return new AppUserDetails(userDao.getUsername(), userDao.getPassword());
     }
 
+    public Long getUserIdByUsername(String s) throws UsernameNotFoundException {
+        return userRepository.findByUsername(s).getId();
+    }
+
 
 }

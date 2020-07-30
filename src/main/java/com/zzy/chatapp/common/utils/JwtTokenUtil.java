@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +19,8 @@ public class JwtTokenUtil {
 
     private static final String CLAIM_KEY_USERNAME = "sub";
     private static final String CLAIM_KEY_CREATED = "created";
+    private static final String HEADER = "Authorization";
+    private static final String HEAD = "Bearer ";
 
     @Value("${jwt.secret}")
     private String secret;
@@ -31,6 +34,10 @@ public class JwtTokenUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + Integer.valueOf(expiration) * 1000))
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
+    }
+
+    public String getTokenFromRequest(HttpServletRequest httpServletRequest) {
+        return httpServletRequest.getHeader(HEADER).substring(HEAD.length());
     }
 
     private Claims getClaimsFromToken(String token) {

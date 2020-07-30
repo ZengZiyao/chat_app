@@ -33,8 +33,6 @@ public class UserService {
         if (userRepository.findByUsername(userDto.getUsername()) != null) {
             throw new DuplicateException("username already exists: " + userDto.getUsername());
         } else {
-
-
             UserDao userDao = new UserDao();
             userDao.setUsername(userDto.getUsername());
             userDao.setPassword(passwordEncoder.encode(userDto.getPassword()));
