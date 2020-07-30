@@ -57,7 +57,7 @@ public class ChatRoomController {
     public ResponseEntity deleteChatRoom(@PathVariable Long chatRoomId, HttpServletRequest httpServletRequest) {
         String username = httpServletRequest.getUserPrincipal().getName();
 
-       chatRoomService.deleteChatRoom(username, chatRoomId);
+        chatRoomService.deleteChatRoom(username, chatRoomId);
         return ResponseEntity.noContent().build();
     }
 
