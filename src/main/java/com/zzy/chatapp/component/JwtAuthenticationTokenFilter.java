@@ -1,10 +1,13 @@
 package com.zzy.chatapp.component;
 
 import com.zzy.chatapp.common.utils.JwtTokenUtil;
-import com.zzy.chatapp.service.AppUserDetailsService;
+import com.zzy.chatapp.service.impl.UserDetailsServiceImpl;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -16,17 +19,20 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@Slf4j
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     private static final String TOKEN_HEADER = "Authorization";
     private static final String TOKEN_HEAD = "Bearer ";
 
-    private final JwtTokenUtil jwtTokenUtil;
-    private final AppUserDetailsService appUserDetailsService;
+    private JwtTokenUtil jwtTokenUtil;
+    private UserDetailsService appUserDetailsService;
+    private RedisTemplate<String, String> redisTemplate;
 
-    public JwtAuthenticationTokenFilter(JwtTokenUtil jwtTokenUtil, AppUserDetailsService appUserDetailsService) {
+    public JwtAuthenticationTokenFilter(JwtTokenUtil jwtTokenUtil, UserDetailsServiceImpl appUserDetailsService, RedisTemplate  redisTemplate) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.appUserDetailsService = appUserDetailsService;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -37,7 +43,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             String token = authHeader.substring(TOKEN_HEAD.length());
             String username = this.jwtTokenUtil.getUsernameFromToken(token);
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (!redisTemplate.opsForValue().get(username).equals(token) && username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.appUserDetailsService.loadUserByUsername(username);
 
                 if (this.jwtTokenUtil.validateToken(token, userDetails)) {

@@ -1,7 +1,9 @@
 package com.zzy.chatapp.controller;
 
+import com.zzy.chatapp.common.utils.JwtTokenUtil;
 import com.zzy.chatapp.dto.UserDto;
 import com.zzy.chatapp.service.UserService;
+import com.zzy.chatapp.service.impl.UserServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,10 +23,12 @@ import java.util.Map;
 @RequestMapping("/user")
 public class UserController {
 
-    private final UserService userService;
+    private UserService userService;
+    private JwtTokenUtil jwtTokenUtil;
 
-    public UserController(UserService userService) {
+    public UserController(UserServiceImpl userService, JwtTokenUtil jwtTokenUtil) {
         this.userService = userService;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @PostMapping("/signup")
@@ -48,6 +52,8 @@ public class UserController {
         if (authentication != null) {
             new SecurityContextLogoutHandler().logout(httpServletRequest, httpServletResponse, authentication);
         }
+
+        jwtTokenUtil.invalidateToken(jwtTokenUtil.getTokenFromRequest(httpServletRequest));
 
         return ResponseEntity.ok("Logout out successfully");
 

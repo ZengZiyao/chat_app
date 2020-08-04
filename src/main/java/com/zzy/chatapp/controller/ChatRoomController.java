@@ -3,6 +3,7 @@ package com.zzy.chatapp.controller;
 import com.zzy.chatapp.dto.ChatRoomDetailsDto;
 import com.zzy.chatapp.dto.ChatRoomResponse;
 import com.zzy.chatapp.service.ChatRoomService;
+import com.zzy.chatapp.service.impl.ChatRoomServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,9 @@ import java.util.Set;
 @RequestMapping("/chatroom")
 public class ChatRoomController {
 
-    private final ChatRoomService chatRoomService;
+    private ChatRoomService chatRoomService;
 
-    public ChatRoomController(ChatRoomService chatRoomService) {
+    public ChatRoomController(ChatRoomServiceImpl chatRoomService) {
         this.chatRoomService = chatRoomService;
     }
 

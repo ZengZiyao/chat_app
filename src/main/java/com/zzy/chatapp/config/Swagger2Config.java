@@ -32,7 +32,6 @@ public class Swagger2Config {
     private static final boolean REQUIRED = false;
 
 
-
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)

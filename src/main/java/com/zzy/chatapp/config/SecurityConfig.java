@@ -1,7 +1,7 @@
 package com.zzy.chatapp.config;
 
 import com.zzy.chatapp.component.JwtAuthenticationTokenFilter;
-import com.zzy.chatapp.service.AppUserDetailsService;
+import com.zzy.chatapp.service.impl.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -18,10 +19,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
-    private final AppUserDetailsService userDetailsService;
+    private  JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+    private  UserDetailsService userDetailsService;
 
-    public SecurityConfig(JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter, AppUserDetailsService userDetailsService) {
+    public SecurityConfig(JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter, UserDetailsServiceImpl userDetailsService) {
         this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
         this.userDetailsService = userDetailsService;
     }

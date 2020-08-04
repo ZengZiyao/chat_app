@@ -1,4 +1,4 @@
-package com.zzy.chatapp.service;
+package com.zzy.chatapp.service.impl;
 
 import com.zzy.chatapp.dao.UserDao;
 import com.zzy.chatapp.model.AppUserDetails;
@@ -9,11 +9,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AppUserDetailsService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
 
-    public AppUserDetailsService(UserRepository userRepository) {
+    public UserDetailsServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -21,12 +21,14 @@ public class AppUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         UserDao userDao = userRepository.findByUsername(s);
 
-        return new AppUserDetails(userDao.getUsername(), userDao.getPassword());
+        if (userDao != null) {
+            return new AppUserDetails(userDao.getUsername(), userDao.getPassword());
+        }
+
+        throw new UsernameNotFoundException(String.format("Username not found: %s", s));
     }
 
     public Long getUserIdByUsername(String s) throws UsernameNotFoundException {
         return userRepository.findByUsername(s).getId();
     }
-
-
 }

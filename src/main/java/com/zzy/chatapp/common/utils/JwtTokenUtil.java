@@ -5,13 +5,13 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -21,12 +21,19 @@ public class JwtTokenUtil {
     private static final String CLAIM_KEY_CREATED = "created";
     private static final String HEADER = "Authorization";
     private static final String HEAD = "Bearer ";
+    private static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
+
+    private RedisTemplate<String, String> redisTemplate;
 
     @Value("${jwt.secret}")
     private String secret;
 
     @Value("${jwt.expiration}")
     private String expiration;
+
+    public JwtTokenUtil(RedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     private String generateToken(Map<String, Object> claims) {
         return Jwts.builder()
@@ -94,6 +101,15 @@ public class JwtTokenUtil {
         Claims claims = getClaimsFromToken(token);
         claims.put(CLAIM_KEY_CREATED, new Date());
         return generateToken(claims);
+    }
+
+    public void invalidateToken(String token) {
+        String username = getUsernameFromToken(token);
+        Date expirationDate = getExpirationDateFromToken(token);
+
+        // Put token in redis blacklist
+        redisTemplate.opsForValue().set(username, token);
+        redisTemplate.expireAt(username, expirationDate);
     }
 
 }
