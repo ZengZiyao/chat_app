@@ -2,6 +2,7 @@ package com.zzy.chatapp.controller;
 
 import com.zzy.chatapp.dto.ChatRoomDetailsDto;
 import com.zzy.chatapp.dto.ChatRoomResponse;
+import com.zzy.chatapp.exception.BadRequestException;
 import com.zzy.chatapp.service.ChatRoomService;
 import com.zzy.chatapp.service.impl.ChatRoomServiceImpl;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,9 @@ public class ChatRoomController {
 
     @PostMapping("")
     public ResponseEntity createChatRoom(@RequestBody ChatRoomDetailsDto chatRoomDetailsDto, HttpServletRequest httpServletRequest) {
+        if (chatRoomDetailsDto.getName() == null || chatRoomDetailsDto.getName() == "") {
+            throw new BadRequestException("Bad attribute value");
+        }
         String username = httpServletRequest.getUserPrincipal().getName();
         long passcode = chatRoomService.createChatRoom(chatRoomDetailsDto, username);
 

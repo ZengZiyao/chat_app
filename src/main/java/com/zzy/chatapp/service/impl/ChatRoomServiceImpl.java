@@ -9,12 +9,15 @@ import com.zzy.chatapp.exception.NotFoundException;
 import com.zzy.chatapp.repository.ChatRoomRepository;
 import com.zzy.chatapp.repository.UserRepository;
 import com.zzy.chatapp.service.ChatRoomService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Service
+@Slf4j
 public class ChatRoomServiceImpl implements ChatRoomService {
     private static final int MIN_PASSCODE = 100000;
 
@@ -29,6 +32,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     }
 
+    @Transactional
     public long createChatRoom(ChatRoomDetailsDto chatRoomDetailsDto, String username) {
         Long userId = userDetailsService.getUserIdByUsername(username);
 
@@ -37,10 +41,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         chatRoomRepository.save(chatRoomDao);
         long passcode = MIN_PASSCODE + chatRoomDao.getId();
         chatRoomDao.setPasscode(passcode);
-
         return passcode;
     }
 
+    @Transactional
     public ChatRoomResponse joinChatRoom(long passcode, String username) {
         Long userId = userDetailsService.getUserIdByUsername(username);
         ChatRoomDao chatRoomDao = chatRoomRepository.findChatRoomDaoByPasscode(passcode);
@@ -58,6 +62,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     }
 
+    @Transactional
     public Set<ChatRoomResponse> getChatRoomsByUser(String username) {
 
         Set<ChatRoomDao> chatRoomDaoSet = userRepository.findByUsername(username).getMyChatRooms();
@@ -78,6 +83,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         throw new ForbiddenException("Forbidden to delete chatRoom: " + chatRoomId);
     }
 
+    @Transactional
     public boolean leaveChatRoom(String username, Long chatRoomId) {
 
         UserDao userDao = userRepository.findByUsername(username);

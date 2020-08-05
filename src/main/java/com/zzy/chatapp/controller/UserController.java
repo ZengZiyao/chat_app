@@ -2,6 +2,7 @@ package com.zzy.chatapp.controller;
 
 import com.zzy.chatapp.common.utils.JwtTokenUtil;
 import com.zzy.chatapp.dto.UserDto;
+import com.zzy.chatapp.exception.BadRequestException;
 import com.zzy.chatapp.service.UserService;
 import com.zzy.chatapp.service.impl.UserServiceImpl;
 import org.springframework.http.HttpStatus;
@@ -33,12 +34,18 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity signup(@RequestBody UserDto userDto) {
+        if (userDto.getUsername() == null || userDto.getPassword() == null) {
+            throw new BadRequestException("Bad attribute values");
+        }
         userService.signUp(userDto);
         return new ResponseEntity("User account created", HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
     public ResponseEntity signin(@RequestBody UserDto userDto) {
+        if (userDto.getUsername() == null || userDto.getPassword() == null) {
+            throw new BadRequestException("Bad attribute values");
+        }
         String token = userService.signIn(userDto);
 
         Map<String, String> tokenMap = new HashMap<>();
