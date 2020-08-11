@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private  UserRepository userRepository;
-    private  PasswordEncoder passwordEncoder;
-    private  JwtTokenUtil jwtTokenUtil;
-    private  UserDetailsService userDetailsService;
+    private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
+    private JwtTokenUtil jwtTokenUtil;
+    private UserDetailsService userDetailsService;
 
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenUtil jwtTokenUtil, UserDetailsServiceImpl userDetailsService) {
         this.userRepository = userRepository;

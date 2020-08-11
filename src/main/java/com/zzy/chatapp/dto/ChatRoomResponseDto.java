@@ -17,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Slf4j
-public class ChatRoomResponse implements Serializable {
+public class ChatRoomResponseDto implements Serializable {
     private Long id;
 
     private long passcode;
@@ -28,9 +28,9 @@ public class ChatRoomResponse implements Serializable {
 
     private Set<ChatRoomMember> memberList;
 
-    public static ChatRoomResponse fromChatRoomDao(ChatRoomDao chatRoomDao) {
+    public static ChatRoomResponseDto fromChatRoomDao(ChatRoomDao chatRoomDao) {
         Set<ChatRoomMember> chatRoomMembers = new HashSet<>();
         chatRoomDao.getMembers().forEach(userDao -> chatRoomMembers.add(ChatRoomMember.fromUserDao(userDao)));
-        return new ChatRoomResponse(chatRoomDao.getId(), chatRoomDao.getPasscode(), chatRoomDao.getName(), ChatRoomMember.fromUserDao(chatRoomDao.getOwner()), chatRoomMembers);
+        return new ChatRoomResponseDto(chatRoomDao.getId(), chatRoomDao.getPasscode(), chatRoomDao.getName(), ChatRoomMember.fromUserDao(chatRoomDao.getOwner()), chatRoomMembers);
     }
 }

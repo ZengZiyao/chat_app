@@ -1,12 +1,13 @@
 package com.zzy.chatapp.controller;
 
 import com.zzy.chatapp.dto.ChatRoomDetailsDto;
-import com.zzy.chatapp.dto.ChatRoomResponse;
+import com.zzy.chatapp.dto.ChatRoomResponseDto;
 import com.zzy.chatapp.exception.BadRequestException;
 import com.zzy.chatapp.service.ChatRoomService;
 import com.zzy.chatapp.service.impl.ChatRoomServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +20,11 @@ import java.util.Set;
 public class ChatRoomController {
 
     private ChatRoomService chatRoomService;
+    private SimpMessagingTemplate simpMessagingTemplate;
 
-    public ChatRoomController(ChatRoomServiceImpl chatRoomService) {
+    public ChatRoomController(ChatRoomServiceImpl chatRoomService, SimpMessagingTemplate simpMessagingTemplate) {
         this.chatRoomService = chatRoomService;
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     @PostMapping("")
@@ -37,23 +40,15 @@ public class ChatRoomController {
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
-    @PostMapping("/join/{passcode}")
-    public ResponseEntity joinChatRoom(@PathVariable long passcode, HttpServletRequest httpServletRequest) {
-        String username = httpServletRequest.getUserPrincipal().getName();
-
-        ChatRoomResponse chatRoomResponse = chatRoomService.joinChatRoom(passcode, username);
-        return ResponseEntity.ok(chatRoomResponse);
-    }
-
     @GetMapping("/by-user")
     public ResponseEntity getMyChatRooms(HttpServletRequest httpServletRequest) {
         String username = httpServletRequest.getUserPrincipal().getName();
 
-        Set<ChatRoomResponse> chatRoomResponseSet = chatRoomService.getChatRoomsByUser(username);
+        Set<ChatRoomResponseDto> chatRoomResponseDtoSet = chatRoomService.getChatRoomsByUser(username);
 
         Map<String, Set> response = new HashMap<>();
 
-        response.put("chatRooms", chatRoomResponseSet);
+        response.put("chatRooms", chatRoomResponseDtoSet);
 
         return ResponseEntity.ok(response);
     }
@@ -66,13 +61,11 @@ public class ChatRoomController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{chatRoomId}")
-    public ResponseEntity leaveChatRoom(@PathVariable Long chatRoomId, HttpServletRequest httpServletRequest) {
-        String username = httpServletRequest.getUserPrincipal().getName();
+    @GetMapping("/{chatRoomId}")
+    public ResponseEntity getChatRoomById(@PathVariable Long chatRoomId) {
 
-        chatRoomService.leaveChatRoom(username, chatRoomId);
-
-        return ResponseEntity.noContent().build();
+        ChatRoomResponseDto chatRoomResponseDto = chatRoomService.getChatRoomById(chatRoomId);
+        return ResponseEntity.ok(chatRoomResponseDto);
     }
 
 

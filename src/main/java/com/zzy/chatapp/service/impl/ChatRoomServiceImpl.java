@@ -3,7 +3,7 @@ package com.zzy.chatapp.service.impl;
 import com.zzy.chatapp.dao.ChatRoomDao;
 import com.zzy.chatapp.dao.UserDao;
 import com.zzy.chatapp.dto.ChatRoomDetailsDto;
-import com.zzy.chatapp.dto.ChatRoomResponse;
+import com.zzy.chatapp.dto.ChatRoomResponseDto;
 import com.zzy.chatapp.exception.ForbiddenException;
 import com.zzy.chatapp.exception.NotFoundException;
 import com.zzy.chatapp.repository.ChatRoomRepository;
@@ -21,9 +21,9 @@ import java.util.Set;
 public class ChatRoomServiceImpl implements ChatRoomService {
     private static final int MIN_PASSCODE = 100000;
 
-    private  ChatRoomRepository chatRoomRepository;
-    private  UserDetailsServiceImpl userDetailsService;
-    private  UserRepository userRepository;
+    private ChatRoomRepository chatRoomRepository;
+    private UserDetailsServiceImpl userDetailsService;
+    private UserRepository userRepository;
 
     public ChatRoomServiceImpl(ChatRoomRepository chatRoomRepository, UserDetailsServiceImpl userDetailsService, UserRepository userRepository) {
         this.chatRoomRepository = chatRoomRepository;
@@ -45,7 +45,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Transactional
-    public ChatRoomResponse joinChatRoom(long passcode, String username) {
+    public ChatRoomResponseDto joinChatRoom(long passcode, String username) {
         Long userId = userDetailsService.getUserIdByUsername(username);
         ChatRoomDao chatRoomDao = chatRoomRepository.findChatRoomDaoByPasscode(passcode);
 
@@ -55,7 +55,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
             userDao.getJoinedChatRooms().add(chatRoomDao);
 
-            return ChatRoomResponse.fromChatRoomDao(chatRoomDao);
+            return ChatRoomResponseDto.fromChatRoomDao(chatRoomDao);
         }
 
         throw new NotFoundException("ChatRoom does not exist with passcode: " + passcode);
@@ -63,13 +63,13 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Transactional
-    public Set<ChatRoomResponse> getChatRoomsByUser(String username) {
+    public Set<ChatRoomResponseDto> getChatRoomsByUser(String username) {
 
         Set<ChatRoomDao> chatRoomDaoSet = userRepository.findByUsername(username).getMyChatRooms();
-        Set<ChatRoomResponse> chatRoomResponseSet = new HashSet<>();
-        chatRoomDaoSet.forEach(chatRoomDao -> chatRoomResponseSet.add(ChatRoomResponse.fromChatRoomDao(chatRoomDao)));
+        Set<ChatRoomResponseDto> chatRoomResponseDtoSet = new HashSet<>();
+        chatRoomDaoSet.forEach(chatRoomDao -> chatRoomResponseDtoSet.add(ChatRoomResponseDto.fromChatRoomDao(chatRoomDao)));
 
-        return chatRoomResponseSet;
+        return chatRoomResponseDtoSet;
     }
 
     public boolean deleteChatRoom(String username, Long chatRoomId) {
@@ -96,6 +96,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         }
 
         throw new NotFoundException("User does not exist: " + username);
+    }
+
+    public ChatRoomResponseDto getChatRoomById(Long chatRoomId) {
+        ChatRoomDao chatRoomDao = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new NotFoundException("ChatRoom not found with id: " + chatRoomId));
+
+        return ChatRoomResponseDto.fromChatRoomDao(chatRoomDao);
     }
 
 }

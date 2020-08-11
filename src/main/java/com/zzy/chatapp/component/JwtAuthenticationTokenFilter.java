@@ -29,7 +29,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     private UserDetailsService appUserDetailsService;
     private RedisTemplate<String, String> redisTemplate;
 
-    public JwtAuthenticationTokenFilter(JwtTokenUtil jwtTokenUtil, UserDetailsServiceImpl appUserDetailsService, RedisTemplate  redisTemplate) {
+    public JwtAuthenticationTokenFilter(JwtTokenUtil jwtTokenUtil, UserDetailsServiceImpl appUserDetailsService, RedisTemplate redisTemplate) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.appUserDetailsService = appUserDetailsService;
         this.redisTemplate = redisTemplate;
